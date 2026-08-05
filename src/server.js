@@ -4,7 +4,7 @@ const express = require("express");
 const connectDatabase = require("./config/database");
 
 const app = express();
-const PORT = Number(process.env.PORT) || 5000;
+const PORT = Number(process.env.PORT) || 5080;
 
 // Basic server middleware only.
 app.use(express.json());
