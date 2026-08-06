@@ -1,10 +1,10 @@
 const express=require("express");
-const tiersController=require("../Controller/usersController")
+const usersController=require("../Controller/usersController")
 
 const router=express.Router();
 
-router.post("/", tiersController.createUser);
-router.patch("/:id/tier", tiersController.createUser);
+router.post("/", usersController.createUser);
+router.patch("/:id/tier", usersController.updateUserTier);
 
 
 module.exports = router;

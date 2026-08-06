@@ -17,8 +17,8 @@ const userSchema = new mongoose.Schema(
             type:mongoose.Schema.Types.ObjectId,
             ref:"Tier",
             required: true,
-            trim: true
-
         }
     }
 )
+
+module.exports = mongoose.model('User', userSchema);

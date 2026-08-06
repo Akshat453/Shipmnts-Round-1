@@ -8,78 +8,103 @@ async function createUser(req, res) {
     try {
         const { name, email, tierId } = req.body;
 
-        const tierIds = await User.findByID(TierID);
-
         if (!tierId) {
-            res.status(404).json({
+            return res.status(400).json({
                 success: false,
-                message: "No tier Found",
+                message: "tierId is required",
             });
         }
 
-        if(tierId.toString()!==User.tierId){
-            res.status(400).json({
-                success: false,
-                message: "Id is required",
-            });
-        }
-
-        if (!name.trim()) {
-            res.status(400).json({
+        if (!name || !name.trim()) {
+            return res.status(400).json({
                 success: false,
                 message: "name is required",
             });
         }
 
-        if (!email.trim()) {
-            res.status(400).json({
+        if (!email || !email.trim()) {
+            return res.status(400).json({
                 success: false,
                 message: "email is required",
             });
         }
 
-        const tier = await Tier.findByID(tierId);
+        // Validate that the referenced tier exists
+        const tier = await Tier.findById(tierId);
+        if (!tier) {
+            return res.status(404).json({
+                success: false,
+                message: "No tier found with the given tierId",
+            });
+        }
 
         const newUser = await User.create({
-                    name: name.trim(),
-                    email:email.trim(),
-                    tier_Id,
-                });
+            name: name.trim(),
+            email: email.trim(),
+            tierId,
+        });
 
-
-        res.status(200).json({
+        return res.status(201).json({
             success: true,
             data: newUser,
         });
 
     }
     catch (error) {
-        if (error.code == 11000) {
-            res.status(409).json({
+        if (error.code === 11000) {
+            return res.status(409).json({
                 success: false,
                 message: "A user with this email already exists",
             });
         }
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: "Something went wrong try again",
         });
     }
 }
 
-async function updateUserTier(req,res){
-    try{
-        const { TierId } = req.params;
+async function updateUserTier(req, res) {
+    try {
+        const { id } = req.params;
+        const { tierId } = req.body;
 
-        const upgradeID=await User.findByIdAndUpdate(tierId,TierId)
-    
-        res.status(200).json({
+        if (!tierId) {
+            return res.status(400).json({
+                success: false,
+                message: "tierId is required",
+            });
+        }
+
+        // Validate that the new tier exists
+        const tier = await Tier.findById(tierId);
+        if (!tier) {
+            return res.status(404).json({
+                success: false,
+                message: "No tier found with the given tierId",
+            });
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(
+            id,
+            { tierId },
+            { new: true }
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json({
+                success: false,
+                message: "No user found with the given id",
+            });
+        }
+
+        return res.status(200).json({
             success: true,
-            data: upgradeID,
+            data: updatedUser,
         });
     }
-    catch(error){
-        res.status(500).json({
+    catch (error) {
+        return res.status(500).json({
             success: false,
             message: "Something went wrong try again",
         });
