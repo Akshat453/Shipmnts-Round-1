@@ -1,4 +1,6 @@
 require("dotenv").config();
+const tierRouter=require("./Routes/tiersRoute")
+const userRouter = require("./Routes/userRoutes")
 
 const express = require("express");
 const connectDatabase = require("./config/database");
@@ -6,8 +8,11 @@ const connectDatabase = require("./config/database");
 const app = express();
 const PORT = Number(process.env.PORT) || 5080;
 
-// Basic server middleware only.
 app.use(express.json());
+
+app.use("/tiers",tierRouter);
+app.use("/users", userRouter);
+
 
 async function startServer() {
   try {
